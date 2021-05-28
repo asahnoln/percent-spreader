@@ -20,6 +20,7 @@ spreadByGroups gs = init percents ++ [lastGroupFixed]
         lastGroupFixed = spreadRedundant (last percents) redundant
 
 balancedList :: Int -> Int -> [Int]
+balancedList _ 0 = []
 balancedList d c = addedList ++ baseList
     where
         (base, r) = quotRem d c
