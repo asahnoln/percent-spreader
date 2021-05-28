@@ -1,33 +1,31 @@
-module Spreader where
+module Spreader (spreadBalanced, spreadByGroups, Group) where
 
 type Count = Int
 type Diff = Int
 data Group = Group Count Diff
 
-basePercent :: Int -> (Int, Int)
-basePercent = quotRem 100
-
 spreadBalanced :: Int -> [Int]
 spreadBalanced count
     | count < 1 = []
-    | otherwise = addedList ++ baseList
-    where
-        (base, r) = basePercent count
-        addedList = replicate r (base + 1)
-        baseList = replicate (count - r) base
+    | otherwise = balancedList 100 count
 
 spreadByGroups :: [Group] -> [[Int]]
 spreadByGroups [] = [[]]
-spreadByGroups gs = initGroups ++ [lastGroupFixed]
+spreadByGroups gs = init percents ++ [lastGroupFixed]
     where
         count = foldr (\(Group x _) acc -> x + acc) 0 gs
-        (base, _) = basePercent count
+        (base, _) = quotRem 100 count
         percents = map (\(Group c d) -> replicate c $ base + d) gs
         redundant = 100 - sum (concat percents)
-        initGroups = init percents
-        lastGroup = last percents
-        lastGroupLength = length lastGroup
-        (redundantBase, r) = quotRem redundant lastGroupLength
-        lastGroupFixed = zipWith (\i x -> x + if i < lastGroupLength then redundantBase else redundantBase + r) [1..] lastGroup
-        
+        lastGroupFixed = spreadRedundant (last percents) redundant
+
+balancedList :: Int -> Int -> [Int]
+balancedList d c = addedList ++ baseList
+    where
+        (base, r) = quotRem d c
+        addedList = replicate r (base + 1)
+        baseList = replicate (c - r) base
+
+spreadRedundant :: [Int] -> Int -> [Int]
+spreadRedundant xs d = zipWith (+) xs $ balancedList d $ length xs
 
