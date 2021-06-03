@@ -11,7 +11,11 @@ For example, I have actors, who should be paid more than other roles, then I
 have producers, who should have more than a crew, etc. Finally I might have a
 small percent for organization funding.
 
-## Balanced spread
+## Modules
+
+### Spreader
+
+#### Balanced spread
 
 `spreadBalanced` takes count, which then divides 100% as evenly as possible.
 For example:
@@ -27,7 +31,7 @@ For example:
 [12,11,11,11,11,11,11,11,11]
 ```
 
-## Spread by groups
+#### Spread by groups
 
 `spreadByGroups` takes list of Group. Group has Count and Difference. When
 percents are calculated, they are separated in their own lists by Count where
@@ -55,3 +59,27 @@ ignored.
 [[10,10,10,10,10],[9,9,9,9],[5,5,4]]
 ```
 
+#### Spread by named groups
+
+`spreadByNamedGroups` is an alternative to `spreadByGroups` when you need to
+name your groups (for show or debug purposes). It returns `NamedList` instead
+of just a list of lists of Ints.
+
+```haskell
+> spreadByNamedGroups [NamedGroup "Actors" 5 (-1), NamedGroup "Orgs" 3 (-2), NamedGroup "Tech" 2 (-3), NamedGroup "Theatre" 1 (-4), NamedGroup "Ads" 1 0]
+[Actors [7,7,7,7,7],Orgs [6,6,6],Tech [5,5],Theatre [4],Ads [33]] 
+```
+
+### Money
+
+#### Convert percent list to money list
+
+`percentsToMoney` is a convenient function to turn list of percents
+(`Integral`) into list of money (`Fractional`)
+
+If you work with result of `spreadByGroups`, `concat` it first.
+
+```haskell
+> percentsToMoney 150000 [25, 25, 10, 10, 5, 5, 5, 5, 5, 2, 1, 1, 1]
+[37500.0,37500.0,15000.0,15000.0,7500.0,7500.0,7500.0,7500.0,7500.0,3000.0,1500.0,1500.0,1500.0]
+```

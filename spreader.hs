@@ -1,11 +1,18 @@
-module Spreader (spreadBalanced, spreadByGroups, Group) where
+module Spreader ( spreadBalanced
+                , spreadByGroups
+                , spreadByNamedGroups
+                , Group
+                , NamedGroup) where
 
 type Count = Int
 type Diff = Int
 type Name = String
 data Group = Group Count Diff deriving Show
 data NamedGroup = NamedGroup Name Count Diff deriving Show
-data NamedList a = NamedList Name [a] deriving Show
+data NamedList a = NamedList Name [a]
+
+instance Show a => Show (NamedList a) where
+    show (NamedList n xs) = concat [n, " ", show xs]
 
 spreadBalanced :: Int -> [Int]
 spreadBalanced count
@@ -40,5 +47,3 @@ spreadByNamedGroups ngs = result
         gs = map (\(NamedGroup _ c d) -> Group c d) ngs
         ps = spreadByGroups gs
         result = zipWith (\xs (NamedGroup n _ _) -> NamedList n xs) ps ngs
-
-        
