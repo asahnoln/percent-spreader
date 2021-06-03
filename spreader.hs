@@ -2,7 +2,10 @@ module Spreader (spreadBalanced, spreadByGroups, Group) where
 
 type Count = Int
 type Diff = Int
-data Group = Group Count Diff
+type Name = String
+data Group = Group Count Diff deriving Show
+data NamedGroup = NamedGroup Name Count Diff deriving Show
+data NamedList a = NamedList Name [a] deriving Show
 
 spreadBalanced :: Int -> [Int]
 spreadBalanced count
@@ -30,3 +33,12 @@ balancedList d c = addedList ++ baseList
 spreadRedundant :: [Int] -> Int -> [Int]
 spreadRedundant xs d = zipWith (+) xs $ balancedList d $ length xs
 
+spreadByNamedGroups :: [NamedGroup] -> [NamedList Int]
+spreadByNamedGroups [] = []
+spreadByNamedGroups ngs = result
+    where
+        gs = map (\(NamedGroup _ c d) -> Group c d) ngs
+        ps = spreadByGroups gs
+        result = zipWith (\xs (NamedGroup n _ _) -> NamedList n xs) ps ngs
+
+        
